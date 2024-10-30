@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class OrderCreationNonParametrizedTests extends AbstractOrderCreationTest {
-    private final String noColor =    "{\"firstName\":\"Иван\"," +
+    private final String ORDER_NO_COLOR =    "{\"firstName\":\"Иван\"," +
                                        "\"lastName\":\"Крылов\"," +
                                        "\"address\":\"Москва, ул. Маросейка, д. 7/8\"," +
                                        "\"metroStation\":\"Китай-Город\"," +
@@ -17,7 +17,7 @@ public class OrderCreationNonParametrizedTests extends AbstractOrderCreationTest
                                        "\"deliveryDate\":\"2024-11-14\"," +
                                        "\"comment\":\"А зачем?\"}";
 
-    private final String nullColor =  "{\"firstName\":\"Михаил\"," +
+    private final String ORDER_NULL_COLOR =  "{\"firstName\":\"Михаил\"," +
                                        "\"lastName\":\"Лермонтов\"," +
                                        "\"address\":\"Москва, Дмитровское ш., д. 46к1\"," +
                                        "\"metroStation\":\"Владыкино\"," +
@@ -31,7 +31,7 @@ public class OrderCreationNonParametrizedTests extends AbstractOrderCreationTest
     @DisplayName("Check status code of POST /api/v1/orders without color")
     @Description("Status 201 on order creation without color")
     public void responseCode200OrderCreationWithoutColor() {
-        response = OrderApi.orderCreate(noColor);
+        response = OrderApi.orderCreate(ORDER_NO_COLOR);
         assertEquals(201, response.statusCode());
     }
 
@@ -39,7 +39,7 @@ public class OrderCreationNonParametrizedTests extends AbstractOrderCreationTest
     @DisplayName("Check response body of POST /api/v1/orders without color")
     @Description("Response \"track: {{number}}\" on order creation without color")
     public void responseBodyContainsTrackIdOrderWithoutColor() {
-        response = OrderApi.orderCreate(noColor);
+        response = OrderApi.orderCreate(ORDER_NO_COLOR);
         assertTrue("No \"track\" key in body", response.body().asString().contains("track"));
         assertTrue("Expected instance of Integer, got " + response.path("track").getClass().getName(),
                     Integer.class.isInstance(response.path("track")));
@@ -49,7 +49,7 @@ public class OrderCreationNonParametrizedTests extends AbstractOrderCreationTest
     @DisplayName("Check status code of POST /api/v1/orders with null color")
     @Description("Status 201 on order creation with null color")
     public void responseCode200OrderCreationNullColor() {
-        response = OrderApi.orderCreate(nullColor);
+        response = OrderApi.orderCreate(ORDER_NULL_COLOR);
         assertEquals(201, response.statusCode());
     }
 
@@ -57,7 +57,7 @@ public class OrderCreationNonParametrizedTests extends AbstractOrderCreationTest
     @DisplayName("Check response body of POST /api/v1/orders with null color")
     @Description("Response \"track: {{number}}\" on order creation with null color")
     public void responseBodyContainsTrackIdOrderCreationNullColor() {
-        response = OrderApi.orderCreate(nullColor);
+        response = OrderApi.orderCreate(ORDER_NULL_COLOR);
         assertTrue("No \"track\" key in body", response.body().asString().contains("track"));
         assertTrue("Expected instance of Integer, got " + response.path("track").getClass().getName(),
                 Integer.class.isInstance(response.path("track")));

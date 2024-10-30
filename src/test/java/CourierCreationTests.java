@@ -14,7 +14,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check status code of POST /api/v1/courier on success")
     @Description("Status 201 on successful courier creation")
     public void responseCode201CourierCreation() {
-        Response response = CourierApi.courierCreate(courier);
+        Response response = CourierApi.courierCreate(COURIER);
         assertEquals(201, response.statusCode());
     }
 
@@ -22,7 +22,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check response body of POST /api/v1/courier on success")
     @Description("Response \"ok: true\" on successful courier creation")
     public void responseBodyContainsOkTrueCourierCreation() {
-        Response response = CourierApi.courierCreate(courier);
+        Response response = CourierApi.courierCreate(COURIER);
         assertTrue("No \"ok\" key in body", response.body().asString().contains("ok"));
         assertTrue("Expected \"ok: true\", got ok: " + response.path("ok"),response.path("ok"));
     }
@@ -31,9 +31,9 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check courier creation with POST /api/v1/courier without firstName")
     @Description("Courier can be created without firstName")
     public void courierCreatesWithoutFirstName() {
-        Response response = CourierApi.courierCreate(new String("{\"login\":\"accesso\",\"password\":\"Passw0rt\"}"));
+        Response response = CourierApi.courierCreate(AUTH_DATA);
         assertEquals(201, response.statusCode());
-        Response loginResponse = CourierApi.courierLogin(new AuthData("accesso", "Passw0rt"));
+        Response loginResponse = CourierApi.courierLogin(AUTH_DATA);
         if (200 == loginResponse.statusCode()) {
             CourierApi.courierDelete(loginResponse.path("id"));
         }
@@ -44,11 +44,11 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check status code of POST /api/v1/courier if courier already exists")
     @Description("Status 409 if courier already exists")
     public void responseCode409WhenCourierAlreadyExists() {
-        Response response = CourierApi.courierCreate(courier);
+        Response response = CourierApi.courierCreate(COURIER);
         assertEquals(201, response.statusCode());
-        response = CourierApi.courierCreate(courier);
+        response = CourierApi.courierCreate(COURIER);
         if (response.statusCode() < 400) {
-            Response loginResponse = CourierApi.courierLogin(new AuthData(courier.getLogin(), courier.getPassword()));
+            Response loginResponse = CourierApi.courierLogin(new AuthData(COURIER.getLogin(), COURIER.getPassword()));
             if (200 == loginResponse.statusCode()) {
                 CourierApi.courierDelete(loginResponse.path("id"));
             }
@@ -60,9 +60,9 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check error message of POST /api/v1/courier if courier already exists")
     @Description("Response \"message: Этот логин уже используется\" if courier already exists")
     public void responseMessageCheckWhenCourierAlreadyExists() {
-        Response response = CourierApi.courierCreate(courier);
+        Response response = CourierApi.courierCreate(COURIER);
         assertEquals(201, response.statusCode());
-        response = CourierApi.courierCreate(courier);
+        response = CourierApi.courierCreate(COURIER);
         assertTrue("No \"message\" key in body", response.body().asString().contains("message"));
         assertTrue("Expected \"message: Этот логин уже используется\", got message: " + response.path("message"),
                     response.path("message").equals("Этот логин уже используется"));
@@ -73,12 +73,12 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check status code of POST /api/v1/courier if login already exists")
     @Description("Status 409 if login already exists")
     public void responseCode409WhenCourierLoginAlreadyExists() {
-        Response response = CourierApi.courierCreate(courier);
+        Response response = CourierApi.courierCreate(COURIER);
         assertEquals(201, response.statusCode());
         Courier sameLoginCourier = new Courier("accesso", "2Passw0rt2", "GandalfTheWhite");
         response = CourierApi.courierCreate(sameLoginCourier);
         if (response.statusCode() < 400) {
-            Response loginResponse = CourierApi.courierLogin(new AuthData(courier.getLogin(), courier.getPassword()));
+            Response loginResponse = CourierApi.courierLogin(new AuthData(COURIER.getLogin(), COURIER.getPassword()));
             if (200 == loginResponse.statusCode()) {
                 CourierApi.courierDelete(loginResponse.path("id"));
             }
@@ -90,8 +90,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check status code of POST /api/v1/courier without password")
     @Description("Status 400 if invoked without password")
     public void responseCode400WithoutPassword() {
-        String requestBody = "{\"login\":\"accesso\",\"firstName\":\"Gandalf\"}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{" + LOGIN + "," + FIRST_NAME + "}");
         assertEquals(400, response.statusCode());
     }
 
@@ -99,8 +98,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check error message of POST /api/v1/courier without password")
     @Description("Response \"message: Недостаточно данных для создания учетной записи\" if invoked without password")
     public void responseMessageCheckWithoutPassword() {
-        String requestBody = "{\"login\":\"accesso\",\"firstName\":\"Gandalf\"}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{" + LOGIN + "," + FIRST_NAME + "}");
         assertTrue("No \"message\" key in body", response.body().asString().contains("message"));
         assertTrue("Expected \"message: Недостаточно данных для создания учетной записи\", got message: " + response.path("message"),
                     response.path("message").equals("Недостаточно данных для создания учетной записи"));
@@ -110,8 +108,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check status code of POST /api/v1/courier with null password")
     @Description("Status 400 if invoked with null password")
     public void responseCode400NullPassword() {
-        String requestBody = "{\"login\":\"accesso\",\"password\":null,\"firstName\":\"Gandalf\"}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{" + LOGIN + ",\"password\":null," + FIRST_NAME + "}");
         assertEquals(400, response.statusCode());
     }
 
@@ -119,8 +116,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check error message of POST /api/v1/courier with null password")
     @Description("Response \"message: Недостаточно данных для создания учетной записи\" if invoked with null password")
     public void responseMessageCheckNullPassword() {
-        String requestBody = "{\"login\":\"accesso\",\"password\":null,\"firstName\":\"Gandalf\"}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{" + LOGIN + ",\"password\":null," + FIRST_NAME + "}");
         assertTrue("No \"message\" key in body", response.body().asString().contains("message"));
         assertTrue("Expected \"message: Недостаточно данных для создания учетной записи\", got message: " + response.path("message"),
                 response.path("message").equals("Недостаточно данных для создания учетной записи"));
@@ -130,8 +126,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check status code of POST /api/v1/courier without login")
     @Description("Status 400 if invoked without login")
     public void responseCode400WithoutLogin() {
-        String requestBody = "{\"password\":\"Passw0rt\",\"firstName\":\"Gandalf\"}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{" + PASSWORD + "," + FIRST_NAME + "}");
         assertEquals(400, response.statusCode());
     }
 
@@ -139,8 +134,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check error message of POST /api/v1/courier without login")
     @Description("Response \"message: Недостаточно данных для создания учетной записи\" if invoked without login")
     public void responseMessageCheckWithoutLogin() {
-        String requestBody = "{\"password\":\"Passw0rt\",\"firstName\":\"Gandalf\"}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{" + PASSWORD + "," + FIRST_NAME + "}");
         assertTrue("No \"message\" key in body", response.body().asString().contains("message"));
         assertTrue("Expected \"message: Недостаточно данных для создания учетной записи\", got message: " + response.path("message"),
                     response.path("message").equals("Недостаточно данных для создания учетной записи"));
@@ -150,8 +144,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check status code of POST /api/v1/courier with null login")
     @Description("Status 400 if invoked with null login")
     public void responseCode400NullLogin() {
-        String requestBody = "{\"login\":null,\"password\":\"Passw0rt\",\"firstName\":\"Gandalf\"}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{\"login\":null," + PASSWORD + "," + FIRST_NAME + "}");
         assertEquals(400, response.statusCode());
     }
 
@@ -159,8 +152,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check error message of POST /api/v1/courier with null login")
     @Description("Response \"message: Недостаточно данных для создания учетной записи\" if invoked with null login")
     public void responseMessageCheckNullLogin() {
-        String requestBody = "{\"login\":null,\"password\":\"Passw0rt\",\"firstName\":\"Gandalf\"}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{\"login\":null," + PASSWORD + "," + FIRST_NAME + "}");
         assertTrue("No \"message\" key in body", response.body().asString().contains("message"));
         assertTrue("Expected \"message: Недостаточно данных для создания учетной записи\", got message: " + response.path("message"),
                 response.path("message").equals("Недостаточно данных для создания учетной записи"));
@@ -170,8 +162,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check status code of POST /api/v1/courier without login and password")
     @Description("Status 400 if invoked without login and password")
     public void responseCode400WithoutLoginAndPasswordInBody() {
-        String requestBody = "{\"firstName\":\"Gandalf\"}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{" + FIRST_NAME + "}");
         assertEquals(400, response.statusCode());
     }
 
@@ -179,8 +170,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check error message of POST /api/v1/courier without login and password")
     @Description("Response \"message: Недостаточно данных для создания учетной записи\" if invoked without login and password")
     public void responseMessageCheckWithoutLoginAndPasswordInBody() {
-        String requestBody = "{\"firstName\":\"Gandalf\"}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{" + FIRST_NAME + "}");
         assertTrue("No \"message\" key in body", response.body().asString().contains("message"));
         assertTrue("Expected \"message: Недостаточно данных для создания учетной записи\", got message: " + response.path("message"),
                     response.path("message").equals("Недостаточно данных для создания учетной записи"));
@@ -190,8 +180,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check status code of POST /api/v1/courier with null login and password")
     @Description("Status 400 if invoked with null login and password")
     public void responseCode400NullLoginAndPasswordInBody() {
-        String requestBody = "{\"login\":null,\"password\":null,\"firstName\":\"Gandalf\"}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{\"login\":null,\"password\":null," + FIRST_NAME + "}");
         assertEquals(400, response.statusCode());
     }
 
@@ -199,8 +188,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check error message of POST /api/v1/courier with null login and password")
     @Description("Response \"message: Недостаточно данных для создания учетной записи\" if invoked with null login and password")
     public void responseMessageCheckNullLoginAndPasswordInBody() {
-        String requestBody = "{\"login\":null,\"password\":null,\"firstName\":\"Gandalf\"}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{\"login\":null,\"password\":null," + FIRST_NAME + "}");
         assertTrue("No \"message\" key in body", response.body().asString().contains("message"));
         assertTrue("Expected \"message: Недостаточно данных для создания учетной записи\", got message: " + response.path("message"),
                 response.path("message").equals("Недостаточно данных для создания учетной записи"));
@@ -210,8 +198,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check status code of POST /api/v1/courier with empty body")
     @Description("Status 400 if invoked with empty body")
     public void responseCode400EmptyBody() {
-        String requestBody = "{}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{}");
         assertEquals(400, response.statusCode());
     }
 
@@ -219,8 +206,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     @DisplayName("Check error message of POST /api/v1/courier with empty body")
     @Description("Response \"message: Недостаточно данных для создания учетной записи\" if invoked with empty body")
     public void responseMessageCheckEmptyBody() {
-        String requestBody = "{}";
-        Response response = CourierApi.courierCreate(requestBody);
+        Response response = CourierApi.courierCreate("{}");
         assertTrue("No \"message\" key in body", response.body().asString().contains("message"));
         assertTrue("Expected \"message: Недостаточно данных для создания учетной записи\", got message: " + response.path("message"),
                 response.path("message").equals("Недостаточно данных для создания учетной записи"));

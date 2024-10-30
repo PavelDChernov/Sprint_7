@@ -91,8 +91,7 @@ public class OrderCreationParametrizedTests extends AbstractOrderCreationTest {
     @DisplayName("Check status code of POST /api/v1/orders on success")
     @Description("Status 201 on successful order creation")
     public void responseCode200OrderCreation() {
-        Order order = new Order(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color);
-        response = OrderApi.orderCreate(order);
+        response = OrderApi.orderCreate(new Order(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color));
         assertEquals(201, response.statusCode());
     }
 
@@ -100,8 +99,7 @@ public class OrderCreationParametrizedTests extends AbstractOrderCreationTest {
     @DisplayName("Check response body of POST /api/v1/orders on success")
     @Description("Response \"track: {{number}}\" on successful courier creation")
     public void responseBodyContainsTrackIdOrderCreation() {
-        Order order = new Order(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color);
-        response = OrderApi.orderCreate(order);
+        response = OrderApi.orderCreate(new Order(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color));
         assertTrue("No \"track\" key in body", response.body().asString().contains("track"));
         assertTrue("Expected instance of Integer, got " + response.path("track").getClass().getName(),
                     Integer.class.isInstance(response.path("track")));

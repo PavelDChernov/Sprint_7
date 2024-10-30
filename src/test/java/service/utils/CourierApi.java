@@ -22,6 +22,20 @@ final public class CourierApi {
         return response;
     }
 
+    public static Response courierCreate(AuthData authData) {
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .and()
+                        .body(authData)
+                        .when()
+                        .post("/api/v1/courier")
+                        .then()
+                        .extract()
+                        .response();
+        return response;
+    }
+
     public static Response courierCreate(String courier) {
         Response response =
                 given()
