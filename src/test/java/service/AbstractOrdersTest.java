@@ -10,7 +10,6 @@ import service.utils.OrderApi;
 import java.util.List;
 
 public class AbstractOrdersTest {
-    protected Response response;
     protected List<Order> orderList = List.of(
                                               new Order(
                                                          "Лев",
@@ -40,10 +39,9 @@ public class AbstractOrdersTest {
     public void initTestData() {
         RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
         for (Order order : orderList) {
-            response = OrderApi.orderCreate(order);
+            Response response = OrderApi.orderCreate(order);
             order.setTrack(response.path("track"));
         }
-        response = null;
     }
 
     @After
@@ -51,6 +49,5 @@ public class AbstractOrdersTest {
         for (Order order : orderList) {
             OrderApi.orderCancel(order.getTrack());
         }
-        response = null;
     }
 }

@@ -14,7 +14,7 @@ public class OrdersTests extends AbstractOrdersTest {
     @DisplayName("Check that GET /api/v1/orders returns orders")
     @Description("GET /api/v1/orders returns orders, pageInfo and avaliableStations")
     public void getOrders() {
-        response = OrderApi.orderGetOrders();
+        Response response = OrderApi.orderGetOrders();
         assertEquals(200,response.statusCode());
         Orders orders = response.as(Orders.class);
         assertNotNull("Cannot Deserialize orders got null object", orders);
