@@ -75,7 +75,7 @@ public class CourierCreationTests extends AbstractCourierCreationTest {
     public void responseCode409WhenCourierLoginAlreadyExists() {
         Response response = CourierApi.courierCreate(COURIER);
         assertEquals(201, response.statusCode());
-        Courier sameLoginCourier = new Courier("accesso", "2Passw0rt2", "GandalfTheWhite");
+        Courier sameLoginCourier = new Courier(COURIER.getLogin(), "2Passw0rt2", "GandalfTheWhite");
         response = CourierApi.courierCreate(sameLoginCourier);
         if (response.statusCode() < 400) {
             Response loginResponse = CourierApi.courierLogin(new AuthData(COURIER.getLogin(), COURIER.getPassword()));
